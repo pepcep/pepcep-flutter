@@ -1,7 +1,7 @@
 name: pepcep_flutter
 description: Pepcep Flutter Plugin.
-version: 0.0.1
-homepage:
+version: 0.1.0
+homepage: https://github.com/pepcep/pepcep-flutter
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
