@@ -41,8 +41,10 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
 
   bool processing = true;
   late String paymentUrl;
+  late String paymentSession;
   late String successUrl;
   late String cancelUrl;
+  late String gateway;
 
   @override
   void initState() {
@@ -55,11 +57,14 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
     return uri.host + uri.path + uri.fragment;
   }
 
-  void closeView() async {
-    String javascript = '''
-      window.close()
-    ''';
-    await webViewController.evaluateJavascript(javascript);
+  String getUrlParam() {
+    return Uri(queryParameters: {
+      'paymentUrl': paymentUrl,
+      'paymentSession': paymentSession,
+      'subDomain': widget.subDomain,
+      'gateway': gateway,
+      'apiKey': widget.apiKey
+    }).query;
   }
 
   initializePayment() async {
@@ -86,8 +91,10 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
         setState(() {
           processing = false;
           paymentUrl = decodedJSON["payment_url"];
+          paymentSession = decodedJSON["session_id"];
           successUrl = decodedJSON["success_url"];
           cancelUrl = decodedJSON["cancel_url"];
+          gateway = decodedJSON["gateway"];
         });
 
         print(CustomTrace(StackTrace.current, message: response.body));
@@ -104,6 +111,22 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
         print(CustomTrace(StackTrace.current, message: e.toString()));
       }
     }
+  }
+
+  JavascriptChannel _javascriptChannel(BuildContext context) {
+    return JavascriptChannel(
+        name: 'Print',
+        onMessageReceived: (JavascriptMessage message) {
+          if (widget.debugMode) {
+            print(CustomTrace(StackTrace.current,
+                message: message.message.toString()));
+          }
+          if (message.message == "paymentSuccess") {
+            widget.onSuccess?.call(message.message);
+          } else if (message.message == "paymentError") {
+            widget.onError?.call(message.message);
+          } else {}
+        });
   }
 
   double opacity = 0.0;
@@ -131,7 +154,7 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
           : Opacity(
               opacity: opacity,
               child: WebView(
-                initialUrl: paymentUrl,
+                initialUrl: "https://frame.pepcep.com/?${getUrlParam()}",
                 gestureNavigationEnabled: true,
                 onProgress: (progress) {},
                 onWebViewCreated: (controller) {
@@ -145,24 +168,20 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
                   });
                 },
                 javascriptMode: JavascriptMode.unrestricted,
+                javascriptChannels: <JavascriptChannel>{
+                  _javascriptChannel(context),
+                },
                 navigationDelegate: (action) {
                   String uri = action.url;
                   if (getParsedUrl(uri) == getParsedUrl(successUrl)) {
                     widget.onSuccess?.call(uri.toString());
-                    closeView();
                   } else if (getParsedUrl(uri) == getParsedUrl(cancelUrl)) {
                     widget.onError?.call(uri.toString());
-                    closeView();
-                  } else if (getParsedUrl(uri) == getParsedUrl(paymentUrl)) {
-                    return NavigationDecision.navigate;
                   } else if (uri.contains("close")) {
                     ///
                     /// close - https://standard.paystack.co/close
                     ///
                     webViewController.goBack();
-                    return NavigationDecision.navigate;
-                  } else {
-                    return NavigationDecision.navigate;
                   }
                   return NavigationDecision.navigate;
                 },

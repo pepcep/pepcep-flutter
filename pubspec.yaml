@@ -1,6 +1,6 @@
 name: pepcep_flutter
 description: Pepcep Flutter Plugin.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/pepcep/pepcep-flutter
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.3
-  webview_flutter: ^2.0.13
+  webview_flutter: ^2.1.1
 
 dev_dependencies:
   flutter_test:
