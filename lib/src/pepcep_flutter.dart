@@ -16,6 +16,7 @@ class PepcepFlutter extends StatefulWidget {
     required this.appBarText,
     required this.email,
     required this.items,
+    this.showAppBar = false,
     this.debugMode = false,
     this.onError,
     this.onSuccess,
@@ -27,6 +28,7 @@ class PepcepFlutter extends StatefulWidget {
   final String email;
   final List items;
   final bool debugMode;
+  final bool showAppBar;
   final ValueChanged<String>? onError;
   final ValueChanged<String>? onSuccess;
 
@@ -40,6 +42,8 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
   late WebViewController webViewController;
 
   bool processing = true;
+  bool pageMounted = false;
+
   late String paymentUrl;
   late String paymentSession;
   late String successUrl;
@@ -129,64 +133,68 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
         });
   }
 
-  double opacity = 0.0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          widget.appBarText,
-          style: Theme.of(context)
-              .textTheme
-              .headline6!
-              .merge(const TextStyle(letterSpacing: 1.3)),
-        ),
-      ),
-      body: processing
-          ? const Center(
+      appBar: widget.showAppBar
+          ? AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              centerTitle: true,
+              title: Text(
+                widget.appBarText,
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6!
+                    .merge(const TextStyle(letterSpacing: 1.3)),
+              ),
+            )
+          : null,
+      body: Stack(
+        children: [
+          if (!pageMounted) ...[
+            const Center(
               child: CircularLoader(height: 200),
             )
-          : Opacity(
-              opacity: opacity,
-              child: WebView(
-                initialUrl: "https://frame.pepcep.com/?${getUrlParam()}",
-                gestureNavigationEnabled: true,
-                onProgress: (progress) {},
-                onWebViewCreated: (controller) {
-                  setState(() {
-                    webViewController = controller;
-                  });
-                },
-                onPageFinished: (url) {
-                  setState(() {
-                    opacity = 1.0;
-                  });
-                },
-                javascriptMode: JavascriptMode.unrestricted,
-                javascriptChannels: <JavascriptChannel>{
-                  _javascriptChannel(context),
-                },
-                navigationDelegate: (action) {
-                  String uri = action.url;
-                  if (getParsedUrl(uri) == getParsedUrl(successUrl)) {
-                    widget.onSuccess?.call(uri.toString());
-                  } else if (getParsedUrl(uri) == getParsedUrl(cancelUrl)) {
-                    widget.onError?.call(uri.toString());
-                  } else if (uri.contains("close")) {
-                    ///
-                    /// close - https://standard.paystack.co/close
-                    ///
-                    webViewController.goBack();
-                  }
-                  return NavigationDecision.navigate;
-                },
-              ),
+          ],
+          if (!processing) ...[
+            WebView(
+              initialUrl: "https://frame.pepcep.com/?${getUrlParam()}",
+              gestureNavigationEnabled: true,
+              onProgress: (progress) {},
+              onWebViewCreated: (controller) {
+                setState(() {
+                  webViewController = controller;
+                });
+              },
+              onPageFinished: (url) {
+                setState(() {
+                  pageMounted = true;
+                });
+              },
+              javascriptMode: JavascriptMode.unrestricted,
+              javascriptChannels: <JavascriptChannel>{
+                _javascriptChannel(context),
+              },
+              navigationDelegate: (action) {
+                String uri = action.url;
+                if (getParsedUrl(uri) == getParsedUrl(successUrl)) {
+                  widget.onSuccess?.call(uri.toString());
+                } else if (getParsedUrl(uri) == getParsedUrl(cancelUrl)) {
+                  widget.onError?.call(uri.toString());
+                } else if (uri.contains("close")) {
+                  ///
+                  /// close - https://standard.paystack.co/close
+                  ///
+                  webViewController.goBack();
+                }
+                return NavigationDecision.navigate;
+              },
             ),
+          ],
+        ],
+      ),
     );
   }
 }
