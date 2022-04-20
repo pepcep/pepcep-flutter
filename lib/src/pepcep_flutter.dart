@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pepcep_flutter/src/helpers/custom_trace.dart';
+import 'package:pepcep_flutter/src/models/options.dart';
 import 'package:pepcep_flutter/src/models/pepcep.dart';
 import 'package:pepcep_flutter/src/widgets/circular_loader.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +16,7 @@ class PepcepFlutter extends StatefulWidget {
     required this.subDomain,
     required this.appBarText,
     required this.email,
+    this.options,
     required this.items,
     this.showAppBar = false,
     this.debugMode = false,
@@ -26,6 +28,7 @@ class PepcepFlutter extends StatefulWidget {
   final String subDomain;
   final String appBarText;
   final String email;
+  final Options? options;
   final List items;
   final bool debugMode;
   final bool showAppBar;
@@ -73,7 +76,8 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
 
   initializePayment() async {
     final client = http.Client();
-    Pepcep pepcep = Pepcep(email: widget.email, items: widget.items);
+    Pepcep pepcep = Pepcep(
+        email: widget.email, items: widget.items, options: widget.options);
 
     final response = await client.post(
       Uri.parse('https://api.pepcep.com/v1/payments/initialize'),

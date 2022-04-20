@@ -56,8 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
               appBarText: "Purchase Payment",
               email: "johndoe@example.com",
               items: const [
-                {"name": "T-Shirt", "amount": 40000},
+                {"name": "T-Shirt", "amount": "40000"},
               ],
+              options: Options(paymentMethods: "banktransfer"),
               onSuccess: (data) {
                 /// Redirect user to success page with `data`
                 setState(() {

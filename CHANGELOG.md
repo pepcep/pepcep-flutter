@@ -10,3 +10,7 @@
 ## 0.1.2
 
 * Allow control of appbar.
+
+## 0.1.3
+
+* Allow payment options argument.
