@@ -82,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
               items: const [
                 {"name": "T-Shirt", "amount": 40000},
               ],
+              options: Options(currency: 'USD', paymentMethods: "cash, banktransfer"),
               onSuccess: (data) {
                 /// Redirect user to success page with `data`
                 setState(() {
@@ -125,6 +126,7 @@ Here is a list of properties available:
 |       appBarText       |  String  |  false   |                 the title of the widget's appbar                  |
 |        email           |  String  |   true   |                         customer email                            |
 |        items           |   List   |   true   |                     list of purchased items                       |
+|       options          |  Options |   false  |                     Custom payment options                        |
 |       onError          | Function |   true   |                 callback to run on payment error                  |
 |       onSuccess        | Function |   true   |                callback to run on payment success                 |
 |       debugMode        |   bool   |  false   |                 to enable or disable package logs                 |

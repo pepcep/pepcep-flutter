@@ -14,3 +14,7 @@
 ## 0.1.3
 
 * Allow payment options argument.
+
+## 0.1.4
+
+* Add currency to payment options argument.

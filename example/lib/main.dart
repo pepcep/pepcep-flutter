@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
               items: const [
                 {"name": "T-Shirt", "amount": "40000"},
               ],
-              options: Options(paymentMethods: "banktransfer"),
+              options: Options(currency: 'USD', paymentMethods: "banktransfer"),
               onSuccess: (data) {
                 /// Redirect user to success page with `data`
                 setState(() {
