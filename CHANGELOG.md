@@ -18,3 +18,7 @@
 ## 0.1.4
 
 * Add currency to payment options argument.
+
+## 0.1.5
+
+* Update webview_flutter pkg and resolve navigation issue with flutter.
