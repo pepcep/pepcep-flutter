@@ -64,16 +64,6 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
     return uri.host + uri.path + uri.fragment;
   }
 
-  String getUrlParam() {
-    return Uri(queryParameters: {
-      'paymentUrl': paymentUrl,
-      'paymentSession': paymentSession,
-      'subDomain': widget.subDomain,
-      'gateway': gateway,
-      'apiKey': widget.apiKey
-    }).query;
-  }
-
   initializePayment() async {
     final client = http.Client();
     Pepcep pepcep = Pepcep(
@@ -123,7 +113,7 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
 
   JavascriptChannel _javascriptChannel(BuildContext context) {
     return JavascriptChannel(
-        name: 'Print',
+        name: 'parent',
         onMessageReceived: (JavascriptMessage message) {
           if (widget.debugMode) {
             print(CustomTrace(StackTrace.current,
@@ -164,7 +154,7 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
           ],
           if (!processing) ...[
             WebView(
-              initialUrl: "https://frame.pepcep.com/?${getUrlParam()}",
+              initialUrl: paymentUrl,
               gestureNavigationEnabled: true,
               onProgress: (progress) {},
               onWebViewCreated: (controller) {
@@ -183,11 +173,7 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
               },
               navigationDelegate: (action) {
                 String uri = action.url;
-                if (getParsedUrl(uri) == getParsedUrl(successUrl)) {
-                  widget.onSuccess?.call(uri.toString());
-                } else if (getParsedUrl(uri) == getParsedUrl(cancelUrl)) {
-                  widget.onError?.call(uri.toString());
-                } else if (uri.contains("close")) {
+                if (uri.contains("close")) {
                   ///
                   /// close - https://standard.paystack.co/close
                   ///
