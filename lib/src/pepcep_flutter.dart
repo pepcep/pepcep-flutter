@@ -119,6 +119,15 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
             print(CustomTrace(StackTrace.current,
                 message: message.message.toString()));
           }
+
+          ///
+          /// flutterwave close click event
+          ///
+          if (message.message.toString() ==
+              "{name: closeiframe, data: {cancelled: false}}") {
+            widget.onSuccess?.call(message.message);
+          }
+
           if (message.message == "paymentSuccess") {
             widget.onSuccess?.call(message.message);
           } else if (message.message == "paymentError") {

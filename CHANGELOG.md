@@ -22,3 +22,7 @@
 ## 0.1.5
 
 * Update webview_flutter pkg and resolve navigation issue with flutter.
+
+## 0.1.6
+
+* Track flutterwave close event.
