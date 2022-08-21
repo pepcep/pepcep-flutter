@@ -30,3 +30,7 @@
 ## 0.1.7
 
 * Resolve issue with tracking flutterwave close events.
+
+## 0.1.8
+
+* Resolve issue with closing flutterwave iframe
