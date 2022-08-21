@@ -123,8 +123,13 @@ class _PepcepFlutterState extends State<PepcepFlutter> {
           ///
           /// flutterwave close click event
           ///
-          if (message.message.toString() ==
-              "{name: closeiframe, data: {cancelled: false}}") {
+          if (message.message.toString().contains("name: closeiframe") &&
+              (message.message
+                      .toString()
+                      .contains("data: {cancelled: false}") ||
+                  message.message
+                      .toString()
+                      .contains("data: {cancelled: 0}"))) {
             widget.onSuccess?.call(message.message);
           }
 

@@ -26,3 +26,7 @@
 ## 0.1.6
 
 * Track flutterwave close event.
+
+## 0.1.7
+
+* Resolve issue with tracking flutterwave close events.
